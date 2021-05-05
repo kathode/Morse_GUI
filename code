@@ -1,0 +1,76 @@
+from tkinter import *
+from tkinter import ttk
+import time
+import RPi.GPIO as GPIO
+
+
+
+
+BLUE = 14
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(BLUE, GPIO.OUT)
+
+
+
+class Win(Tk):
+    def __init__(self):
+        super(Win, self).__init__()
+        self.title("Morse code")
+        self.UI()
+     
+    def LEDS(self, delay):
+        GPIO.output(BLUE, GPIO.HIGH)
+        time.sleep(delay)
+        GPIO.output(BLUE, GPIO.LOW)
+        time.sleep(0.5)
+        
+    def LimitSize(self):
+        self.value = self.name.get()
+        word = list(self.value[:12].upper())
+        print(word)
+        print(len(word), " characters")
+        
+        for letter in word:
+            time.sleep(1)
+            letters = MORSE_CODE_DICT[letter]
+            print(letter + " ", letters)
+            for codes in letters:
+                if codes == "-":
+                    self.LEDS(0.5)
+                elif codes == ".":
+                    self.LEDS(0.2)
+                elif codes == " ":
+                    time.sleep(1)
+
+    def UI(self):
+        
+        self.name = StringVar()
+        
+        self.label = ttk.Label(self, text = "Enter a Word (Max 12 characters)")
+        self.label.grid(column = 0, row = 0)
+                
+        self.textbox = ttk.Entry(self, width = 20, textvariable = self.name)
+        self.textbox.grid(column = 0, row = 1)
+        
+        self.button = ttk.Button(self, text = "Click to Convert", command = self.LimitSize)
+        self.button.grid(column = 0, row = 2)
+        
+
+
+MORSE_CODE_DICT = { 'A':'.-', 'B':'-...',
+                    'C':'-.-.', 'D':'-..', 'E':'.',
+                    'F':'..-.', 'G':'--.', 'H':'....',
+                    'I':'..', 'J':'.---', 'K':'-.-',
+                    'L':'.-..', 'M':'--', 'N':'-.',
+                    'O':'---', 'P':'.--.', 'Q':'--.-',
+                    'R':'.-.', 'S':'...', 'T':'-',
+                    'U':'..-', 'V':'...-', 'W':'.--',
+                    'X':'-..-', 'Y':'-.--', 'Z':'--..',
+                    ' ':'/'
+                    }
+
+
+win = Win()
+win.mainloop()
+GPIO.cleanup()
+
